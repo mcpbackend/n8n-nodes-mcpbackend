@@ -1,0 +1,609 @@
+[
+  {
+    "name": "add_column",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Add a column to an existing table. NOT NULL columns require a defaultValue.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId",
+        "table",
+        "column"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        },
+        "column": {
+          "type": "object",
+          "required": [
+            "name",
+            "type"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "text",
+                "integer",
+                "real",
+                "boolean",
+                "timestamp",
+                "json",
+                "uuid",
+                "blob"
+              ]
+            },
+            "notNull": {
+              "type": "boolean"
+            },
+            "unique": {
+              "type": "boolean"
+            },
+            "primaryKey": {
+              "type": "boolean"
+            },
+            "defaultValue": {
+              "type": "string"
+            },
+            "references": {
+              "type": "object",
+              "properties": {
+                "table": {
+                  "type": "string"
+                },
+                "column": {
+                  "type": "string"
+                },
+                "onDelete": {
+                  "type": "string",
+                  "enum": [
+                    "NO ACTION",
+                    "RESTRICT",
+                    "CASCADE",
+                    "SET NULL"
+                  ]
+                },
+                "onUpdate": {
+                  "type": "string",
+                  "enum": [
+                    "NO ACTION",
+                    "RESTRICT",
+                    "CASCADE",
+                    "SET NULL"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "add_team_member",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    },
+    "description": "Add a team member by email with full access or access to selected projects. Sends an invitation email.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "email",
+        "access"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "full",
+            "project"
+          ]
+        },
+        "projectIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Required when access is project"
+        }
+      }
+    }
+  },
+  {
+    "name": "create_api_key",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Create a server-side API key for a project's data API. Empty permissions = full access; otherwise per-table {table, read, create, update, delete}. Returns the secret once. The secret grants server-side access and is unsuitable for public client code.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId",
+        "name"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "create_project",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Create a new project. Provisions a dedicated database and returns the project id plus canonical application API URLs.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable project name"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "enum": [
+            "eu"
+          ],
+          "description": "Optional EU data residency"
+        }
+      }
+    }
+  },
+  {
+    "name": "create_table",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Create a table in a project's database. An integer primary key `id` is added automatically unless you define your own primary key or an `id` column.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId",
+        "name",
+        "columns"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "integer",
+                  "real",
+                  "boolean",
+                  "timestamp",
+                  "json",
+                  "uuid",
+                  "blob"
+                ]
+              },
+              "notNull": {
+                "type": "boolean"
+              },
+              "unique": {
+                "type": "boolean"
+              },
+              "primaryKey": {
+                "type": "boolean"
+              },
+              "defaultValue": {
+                "type": "string"
+              },
+              "references": {
+                "type": "object",
+                "properties": {
+                  "table": {
+                    "type": "string"
+                  },
+                  "column": {
+                    "type": "string"
+                  },
+                  "onDelete": {
+                    "type": "string",
+                    "enum": [
+                      "NO ACTION",
+                      "RESTRICT",
+                      "CASCADE",
+                      "SET NULL"
+                    ]
+                  },
+                  "onUpdate": {
+                    "type": "string",
+                    "enum": [
+                      "NO ACTION",
+                      "RESTRICT",
+                      "CASCADE",
+                      "SET NULL"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "indexes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "columns"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "unique": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "create_webhook",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": true
+    },
+    "description": "Create a webhook that POSTs on row changes. events like ['posts.created','*.deleted','*']. Returns the signing secret once.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId",
+        "url"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "get_project",
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Get an existing project by id, including its canonical data-plane API URLs.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "get_project_api",
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Get the exact runtime API contract for an existing or newly created project. Returns canonical route templates, security guidance, and the generated OpenAPI document.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "required": [
+        "projectId",
+        "api",
+        "openapi"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "api": {
+          "type": "object",
+          "required": [
+            "baseUrl",
+            "tableUrlTemplate",
+            "recordUrlTemplate",
+            "authBaseUrl",
+            "integrationGuidance"
+          ],
+          "properties": {
+            "baseUrl": {
+              "type": "string"
+            },
+            "tableUrlTemplate": {
+              "type": "string"
+            },
+            "recordUrlTemplate": {
+              "type": "string"
+            },
+            "authBaseUrl": {
+              "type": "string"
+            },
+            "integrationGuidance": {
+              "type": "object"
+            }
+          }
+        },
+        "openapi": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  {
+    "name": "get_schema",
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Get the tables/columns schema of a project. This describes the storage schema.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "get_usage",
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "Get the current-month usage and plan limits for a project.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "list_projects",
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "List the caller's McpBackend projects. Each project includes canonical data-plane API URLs.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "list_team_members",
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    },
+    "description": "List team members, their access scope, and projects owned by the caller for assignment.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "remove_team_member",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": false
+    },
+    "description": "Remove a member from the caller's team and revoke all shared project access.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "memberId"
+      ],
+      "properties": {
+        "memberId": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "set_auth_enabled",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": false
+    },
+    "description": "Enable or disable end-user (email/password) authentication for a project.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId",
+        "enabled"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  {
+    "name": "set_table_rls",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": false
+    },
+    "description": "Set row-level security for a table. Modes: public (anyone), authenticated (any logged-in user), owner (only the user's own rows). 'owner' adds an owner column automatically.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "projectId",
+        "table",
+        "read",
+        "write"
+      ],
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        },
+        "read": {
+          "type": "string",
+          "enum": [
+            "public",
+            "authenticated",
+            "owner"
+          ]
+        },
+        "write": {
+          "type": "string",
+          "enum": [
+            "public",
+            "authenticated",
+            "owner"
+          ]
+        },
+        "ownerColumn": {
+          "type": "string",
+          "description": "Defaults to owner_id"
+        }
+      }
+    }
+  },
+  {
+    "name": "update_team_member",
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": false
+    },
+    "description": "Change a team member between full access and selected-project access.",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "memberId",
+        "access"
+      ],
+      "properties": {
+        "memberId": {
+          "type": "string"
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "full",
+            "project"
+          ]
+        },
+        "projectIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+]
