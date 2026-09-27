@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-mcpbackend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "n8n community node for MCPBackend: OAuth account connection and 16 workflow operations.",
   "license": "MIT",
   "homepage": "https://mcpbackend.com",
@@ -14,7 +14,7 @@
   "author": {
     "name": "MCPBackend",
     "url": "https://mcpbackend.com",
-    "email": "codex@users.noreply.github.com"
+    "email": "saeedmshdi@gmail.com"
   },
   "repository": {
     "type": "git",
