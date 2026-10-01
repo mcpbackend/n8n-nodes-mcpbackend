@@ -1,76 +1,54 @@
-# n8n-nodes-mcpbackend
+# MCPBackend for n8n
 
-Connect [**MCPBackend**](https://mcpbackend.com) to n8n workflows using your own account. This package exposes 16 named operations through the product's authenticated API, with form fields for required inputs and optional fields you choose explicitly.
+Build workflows with the [MCPBackend](https://mcpbackend.com) REST API. This community node sends ordinary HTTP resource requests and returns JSON responses. It does not connect to an MCP server or use JSON-RPC.
 
 ## Installation
 
-For self-hosted n8n, open **Settings → Community Nodes → Install** and enter `n8n-nodes-mcpbackend`. On n8n Cloud, installation depends on n8n's community-node verification; npm publication alone does not make a node verified.
-
-Use n8n **2.40.7 or newer**, with OAuth dynamic client registration support. Older installations should upgrade before using this credential.
+Install `n8n-nodes-mcpbackend` from **Settings → Community nodes** in your n8n instance. You can also install the npm package in a self-hosted n8n installation.
 
 ## Authentication
 
-1. Add the **MCPBackend** node and create a **MCPBackend OAuth2 API** credential.
-2. Click **Connect my account**. n8n discovers the product authorization server and registers its own callback automatically.
-3. Sign in to your MCPBackend account, check the account and permissions on the consent screen, and approve the connection.
-4. Save the credential and select an operation.
+Create the **MCPBackend OAuth2 API** credential, select **Connect my account**, sign in to MCPBackend, and approve the listed permissions. Credentials use dynamic registration, OAuth authorization code flow, PKCE, expiring access tokens, and refresh tokens. The API resource is `https://mcp.mcpbackend.com/v1`; REST tokens are separate from MCP tokens.
 
-No API key, client secret, browser cookie, or access token belongs in a workflow field. n8n stores the OAuth credential and refreshes tokens. Your account roles, ownership checks, available integrations, plan limits and credits still apply. You can revoke the connection in the product's connected-app settings. This node contacts only `https://mcp.mcpbackend.com/mcp`; the n8n OAuth flow contacts the product's discovered authorization server.
+**Upgrading from 1.x:** reconnect the credential before running workflows. Version 2 replaces the old MCP transport with the native REST API. Inputs retain their names, while outputs are the API's resource JSON. Review existing workflows before enabling writes.
 
 ## Operations
 
-| Operation | Access | Purpose |
-| --- | --- | --- |
-| Add Column | Write / may use credits | Add a column to an existing table. NOT NULL columns require a defaultValue. |
-| Add Team Member | Write / may use credits | Add a team member by email with full access or access to selected projects. Sends an invitation email. |
-| Create API Key | Write / may use credits | Create a server-side API key for a project's data API. Empty permissions = full access; otherwise per-table {table, read, create, update, delete}. Returns the secret once. The secret grants server-side access and is unsuitable for public client code. |
-| Create Project | Write / may use credits | Create a new project. Provisions a dedicated database and returns the project id plus canonical application API URLs. |
-| Create Table | Write / may use credits | Create a table in a project's database. An integer primary key `id` is added automatically unless you define your own primary key or an `id` column. |
-| Create Webhook | Write / may use credits | Create a webhook that POSTs on row changes. events like ['posts.created','*.deleted','*']. Returns the signing secret once. |
-| Get Project | Read | Get an existing project by id, including its canonical data-plane API URLs. |
-| Get Project API | Read | Get the exact runtime API contract for an existing or newly created project. Returns canonical route templates, security guidance, and the generated OpenAPI document. |
-| Get Schema | Read | Get the tables/columns schema of a project. This describes the storage schema. |
-| Get Usage | Read | Get the current-month usage and plan limits for a project. |
-| List Projects | Read | List the caller's McpBackend projects. Each project includes canonical data-plane API URLs. |
-| List Team Members | Read | List team members, their access scope, and projects owned by the caller for assignment. |
-| Remove Team Member | Write / may use credits | Remove a member from the caller's team and revoke all shared project access. |
-| Set Auth Enabled | Write / may use credits | Enable or disable end-user (email/password) authentication for a project. |
-| Set Table RLS | Write / may use credits | Set row-level security for a table. Modes: public (anyone), authenticated (any logged-in user), owner (only the user's own rows). 'owner' adds an owner column automatically. |
-| Update Team Member | Write / may use credits | Change a team member between full access and selected-project access. |
+| Operation | HTTP request |
+| --- | --- |
+| add_column | `POST /v1/projects/:projectId/tables/:table/columns` |
+| add_team_member | `POST /v1/team` |
+| create_api_key | `POST /v1/projects/:projectId/keys` |
+| create_project | `POST /v1/projects` |
+| create_table | `POST /v1/projects/:projectId/tables` |
+| create_webhook | `POST /v1/projects/:projectId/webhooks` |
+| get_project | `GET /v1/projects/:projectId` |
+| get_project_api | `GET /v1/projects/:projectId/openapi.json` |
+| get_schema | `GET /v1/projects/:projectId/schema` |
+| get_usage | `GET /v1/projects/:projectId/usage` |
+| list_projects | `GET /v1/projects` |
+| list_team_members | `GET /v1/team` |
+| remove_team_member | `DELETE /v1/team/:memberId` |
+| set_auth_enabled | `PUT /v1/projects/:projectId/auth` |
+| set_table_rls | `PUT /v1/projects/:projectId/tables/:table/rls` |
+| update_team_member | `PATCH /v1/team/:memberId` |
 
-## Example workflow
+## Signed webhook trigger
 
-Import [the included example](examples/account-check.json), select your credential, and execute the manual trigger. It runs **List Projects** once and outputs the account response. Replace the trigger with a schedule to build a recurring report, then connect a filter, spreadsheet or notification node.
+The **MCPBackend Trigger** registers an event subscription when a workflow activates, checks the stored subscription on subsequent activations, and removes only that subscription when the workflow deactivates. It verifies the provider's HMAC signature against the original request body, checks event freshness and resource ownership, and rejects unsigned or altered payloads. Signing secrets stay in the node's workflow state and are never emitted as event data.
 
-For operations that return IDs, map the returned ID into the required field of a second MCPBackend node. Returned arrays stay inside the response object; use n8n's **Split Out** node when you need one item per record. Pagination fields are exposed only where the product supports them; advance the cursor/page explicitly rather than assuming all records were fetched.
+Use a public HTTPS n8n webhook URL. Select an owned project and its event types. Product plan and role requirements still apply. Testing a trigger temporarily registers its test URL; cleanup removes that subscription when n8n stops listening.
 
-## Writes and account limits
+## Workflow behavior
 
-Write operations require **Confirm Write Operation**. Review the inputs before enabling it: every workflow execution may repeat the action, create a draft, change account data, or consume product credits depending on the selected operation. The node does not retry write operations automatically. Use read-only operations for monitoring and deduplicate scheduled workflows that create data. Product authorization remains enforced by the server.
+Each input item makes one API request and produces one linked output item. Optional pagination fields can be passed through the node's options; list responses retain their next-page cursor or offset. Write operations require the node's explicit confirmation switch. Failed requests stop the workflow unless **Continue On Fail** is enabled. HTTP errors are summarized without including credentials or raw request headers.
 
-## Error handling
+Requests use the fixed product API origin, encode resource identifiers, and do not follow redirects. Use a dedicated account for automation when you want separate access and data. Account ownership, workspace permissions, billing limits, and entitlement checks are enforced by the product API.
 
-- Reconnect OAuth after an authorization failure or revoked grant.
-- Check account permissions and plan limits for forbidden or rate-limited responses.
-- Invalid inputs stop the item before sending a request. Product-specific validation remains authoritative.
-- **On Error → Continue** returns an error item linked to the original input. Failed MCP tool results are never returned as successful data.
-- No passwords, environment variables, or customer data are bundled. No external runtime dependencies are installed by this package.
+## Development and support
 
-## Development
+Run `npm ci`, `npm run lint`, and `npm test` to build and validate the package with the n8n node CLI. Source and release automation: [mcpbackend/n8n-nodes-mcpbackend](https://github.com/mcpbackend/n8n-nodes-mcpbackend). Report node issues in [GitHub Issues](https://github.com/mcpbackend/n8n-nodes-mcpbackend/issues).
 
-```sh
-npm ci --ignore-scripts
-npm run lint
-npm test
-```
+Product: [MCPBackend](https://mcpbackend.com) · [Privacy](https://mcpbackend.com/privacy/) · [Agent skill](https://github.com/mcpbackend/agent-skill) · [MCP integration](https://github.com/mcpbackend/mcp-server)
 
-Releases are built and tested in [GitHub Actions](https://github.com/mcpbackend/n8n-nodes-mcpbackend/actions), then published to npm with provenance. Public snapshots use GitHub Actions bot attribution.
-
-## Links
-
-- [Website](https://mcpbackend.com)
-- [Privacy policy](https://mcpbackend.com/privacy/)
-- [Source and issues](https://github.com/mcpbackend/n8n-nodes-mcpbackend)
-- [n8n community-node installation](https://docs.n8n.io/integrations/community-nodes/installation/)
-
-MIT licensed. This community integration is not an n8n core node.
+MIT license.

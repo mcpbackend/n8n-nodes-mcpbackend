@@ -18,13 +18,13 @@ export class MCPBackendOAuth2Api implements ICredentialType {
       displayName: "Server URL",
       name: "serverUrl",
       type: "hidden",
-      default: "https://mcp.mcpbackend.com/mcp",
+      default: "https://mcp.mcpbackend.com/v1",
     },
     {
       displayName: "Resource URL",
       name: "resourceUrl",
       type: "hidden",
-      default: "https://mcp.mcpbackend.com/mcp",
+      default: "https://mcp.mcpbackend.com/v1",
     },
   ];
 }

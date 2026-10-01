@@ -1,0 +1,66 @@
+{
+  "list_projects": {
+    "method": "GET",
+    "path": "/v1/projects"
+  },
+  "create_project": {
+    "method": "POST",
+    "path": "/v1/projects"
+  },
+  "get_project": {
+    "method": "GET",
+    "path": "/v1/projects/:projectId"
+  },
+  "get_project_api": {
+    "method": "GET",
+    "path": "/v1/projects/:projectId/openapi.json"
+  },
+  "get_schema": {
+    "method": "GET",
+    "path": "/v1/projects/:projectId/schema"
+  },
+  "create_table": {
+    "method": "POST",
+    "path": "/v1/projects/:projectId/tables"
+  },
+  "add_column": {
+    "method": "POST",
+    "path": "/v1/projects/:projectId/tables/:table/columns"
+  },
+  "set_table_rls": {
+    "method": "PUT",
+    "path": "/v1/projects/:projectId/tables/:table/rls"
+  },
+  "create_api_key": {
+    "method": "POST",
+    "path": "/v1/projects/:projectId/keys"
+  },
+  "set_auth_enabled": {
+    "method": "PUT",
+    "path": "/v1/projects/:projectId/auth"
+  },
+  "create_webhook": {
+    "method": "POST",
+    "path": "/v1/projects/:projectId/webhooks"
+  },
+  "get_usage": {
+    "method": "GET",
+    "path": "/v1/projects/:projectId/usage"
+  },
+  "list_team_members": {
+    "method": "GET",
+    "path": "/v1/team"
+  },
+  "add_team_member": {
+    "method": "POST",
+    "path": "/v1/team"
+  },
+  "update_team_member": {
+    "method": "PATCH",
+    "path": "/v1/team/:memberId"
+  },
+  "remove_team_member": {
+    "method": "DELETE",
+    "path": "/v1/team/:memberId"
+  }
+}
