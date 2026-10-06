@@ -1,45 +1,66 @@
 [
   {
+    "displayName": "Resource",
+    "name": "resource",
+    "type": "options",
+    "noDataExpression": true,
+    "options": [
+      {
+        "name": "API Key",
+        "value": "api-key"
+      },
+      {
+        "name": "Project",
+        "value": "projects"
+      },
+      {
+        "name": "Schema",
+        "value": "schema"
+      },
+      {
+        "name": "Team Member",
+        "value": "team"
+      },
+      {
+        "name": "Webhook",
+        "value": "webhook"
+      }
+    ],
+    "default": "projects"
+  },
+  {
     "displayName": "Operation",
     "name": "operation",
     "type": "options",
     "noDataExpression": true,
     "options": [
       {
-        "name": "Add Column",
-        "value": "add_column",
-        "description": "Add a column to an existing table. NOT NULL columns require a defaultValue",
-        "action": "Add Column in MCPBackend"
-      },
-      {
-        "name": "Add Team Member",
-        "value": "add_team_member",
-        "description": "Add a team member by email with full access or access to selected projects. Sends an invitation email",
-        "action": "Add Team Member in MCPBackend"
-      },
-      {
         "name": "Create API Key",
         "value": "create_api_key",
         "description": "Create a server-side API key for a project's data API. Empty permissions = full access; otherwise per-table {table, read, create, update, delete}. Returns the secret once. The secret grants server-side access and is unsuitable for public client code",
         "action": "Create API Key in MCPBackend"
-      },
+      }
+    ],
+    "default": "create_api_key",
+    "displayOptions": {
+      "show": {
+        "resource": [
+          "api-key"
+        ]
+      }
+    }
+  },
+  {
+    "displayName": "Operation",
+    "name": "operation",
+    "type": "options",
+    "noDataExpression": true,
+    "options": [
       {
         "name": "Create Project",
         "value": "create_project",
         "description": "Create a new project. Provisions a dedicated database and returns the project id plus canonical application API URLs",
         "action": "Create Project in MCPBackend"
-      },
-      {
-        "name": "Create Table",
-        "value": "create_table",
-        "description": "Create a table in a project's database. An integer primary key `id` is added automatically unless you define your own primary key or an `id` column",
-        "action": "Create Table in MCPBackend"
-      },
-      {
-        "name": "Create Webhook",
-        "value": "create_webhook",
-        "description": "Create a webhook that POSTs on row changes. events like ['posts.created','*.deleted','*']. Returns the signing secret once",
-        "action": "Create Webhook in MCPBackend"
       },
       {
         "name": "Get Project",
@@ -54,12 +75,6 @@
         "action": "Get Project API in MCPBackend"
       },
       {
-        "name": "Get Schema",
-        "value": "get_schema",
-        "description": "Get the tables/columns schema of a project. This describes the storage schema",
-        "action": "Get Schema in MCPBackend"
-      },
-      {
         "name": "Get Usage",
         "value": "get_usage",
         "description": "Get the current-month usage and plan limits for a project",
@@ -70,6 +85,74 @@
         "value": "list_projects",
         "description": "List the caller's McpBackend projects. Each project includes canonical data-plane API URLs",
         "action": "List Projects in MCPBackend"
+      },
+      {
+        "name": "Set Auth Enabled",
+        "value": "set_auth_enabled",
+        "description": "Enable or disable end-user (email/password) authentication for a project",
+        "action": "Set Auth Enabled in MCPBackend"
+      }
+    ],
+    "default": "list_projects",
+    "displayOptions": {
+      "show": {
+        "resource": [
+          "projects"
+        ]
+      }
+    }
+  },
+  {
+    "displayName": "Operation",
+    "name": "operation",
+    "type": "options",
+    "noDataExpression": true,
+    "options": [
+      {
+        "name": "Add Column",
+        "value": "add_column",
+        "description": "Add a column to an existing table. NOT NULL columns require a defaultValue",
+        "action": "Add Column in MCPBackend"
+      },
+      {
+        "name": "Create Table",
+        "value": "create_table",
+        "description": "Create a table in a project's database. An integer primary key `id` is added automatically unless you define your own primary key or an `id` column",
+        "action": "Create Table in MCPBackend"
+      },
+      {
+        "name": "Get Schema",
+        "value": "get_schema",
+        "description": "Get the tables/columns schema of a project. This describes the storage schema",
+        "action": "Get Schema in MCPBackend"
+      },
+      {
+        "name": "Set Table RLS",
+        "value": "set_table_rls",
+        "description": "Set row-level security for a table. Modes: public (anyone), authenticated (any logged-in user), owner (only the user's own rows). 'owner' adds an owner column automatically",
+        "action": "Set Table RLS in MCPBackend"
+      }
+    ],
+    "default": "add_column",
+    "displayOptions": {
+      "show": {
+        "resource": [
+          "schema"
+        ]
+      }
+    }
+  },
+  {
+    "displayName": "Operation",
+    "name": "operation",
+    "type": "options",
+    "noDataExpression": true,
+    "options": [
+      {
+        "name": "Add Team Member",
+        "value": "add_team_member",
+        "description": "Add a team member by email with full access or access to selected projects. Sends an invitation email",
+        "action": "Add Team Member in MCPBackend"
       },
       {
         "name": "List Team Members",
@@ -84,25 +167,42 @@
         "action": "Remove Team Member in MCPBackend"
       },
       {
-        "name": "Set Auth Enabled",
-        "value": "set_auth_enabled",
-        "description": "Enable or disable end-user (email/password) authentication for a project",
-        "action": "Set Auth Enabled in MCPBackend"
-      },
-      {
-        "name": "Set Table RLS",
-        "value": "set_table_rls",
-        "description": "Set row-level security for a table. Modes: public (anyone), authenticated (any logged-in user), owner (only the user's own rows). 'owner' adds an owner column automatically",
-        "action": "Set Table RLS in MCPBackend"
-      },
-      {
         "name": "Update Team Member",
         "value": "update_team_member",
         "description": "Change a team member between full access and selected-project access",
         "action": "Update Team Member in MCPBackend"
       }
     ],
-    "default": "list_projects"
+    "default": "add_team_member",
+    "displayOptions": {
+      "show": {
+        "resource": [
+          "team"
+        ]
+      }
+    }
+  },
+  {
+    "displayName": "Operation",
+    "name": "operation",
+    "type": "options",
+    "noDataExpression": true,
+    "options": [
+      {
+        "name": "Create Webhook",
+        "value": "create_webhook",
+        "description": "Create a webhook that POSTs on row changes. events like ['posts.created','*.deleted','*']. Returns the signing secret once",
+        "action": "Create Webhook in MCPBackend"
+      }
+    ],
+    "default": "create_webhook",
+    "displayOptions": {
+      "show": {
+        "resource": [
+          "webhook"
+        ]
+      }
+    }
   },
   {
     "displayName": "This operation changes data or may use account credits. Review the inputs and the product permissions before running this workflow.",
@@ -122,6 +222,13 @@
           "set_auth_enabled",
           "set_table_rls",
           "update_team_member"
+        ],
+        "resource": [
+          "api-key",
+          "projects",
+          "schema",
+          "team",
+          "webhook"
         ]
       }
     }
@@ -145,6 +252,13 @@
           "set_auth_enabled",
           "set_table_rls",
           "update_team_member"
+        ],
+        "resource": [
+          "api-key",
+          "projects",
+          "schema",
+          "team",
+          "webhook"
         ]
       }
     }
@@ -160,6 +274,9 @@
       "show": {
         "operation": [
           "add_column"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -175,6 +292,9 @@
       "show": {
         "operation": [
           "add_column"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -190,6 +310,9 @@
       "show": {
         "operation": [
           "add_column"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -205,6 +328,9 @@
       "show": {
         "operation": [
           "add_team_member"
+        ],
+        "resource": [
+          "team"
         ]
       }
     }
@@ -230,6 +356,9 @@
       "show": {
         "operation": [
           "add_team_member"
+        ],
+        "resource": [
+          "team"
         ]
       }
     }
@@ -244,6 +373,9 @@
       "show": {
         "operation": [
           "add_team_member"
+        ],
+        "resource": [
+          "team"
         ]
       }
     },
@@ -268,6 +400,9 @@
       "show": {
         "operation": [
           "create_api_key"
+        ],
+        "resource": [
+          "api-key"
         ]
       }
     }
@@ -283,6 +418,9 @@
       "show": {
         "operation": [
           "create_api_key"
+        ],
+        "resource": [
+          "api-key"
         ]
       }
     }
@@ -297,6 +435,9 @@
       "show": {
         "operation": [
           "create_api_key"
+        ],
+        "resource": [
+          "api-key"
         ]
       }
     },
@@ -321,6 +462,9 @@
       "show": {
         "operation": [
           "create_project"
+        ],
+        "resource": [
+          "projects"
         ]
       }
     }
@@ -335,6 +479,9 @@
       "show": {
         "operation": [
           "create_project"
+        ],
+        "resource": [
+          "projects"
         ]
       }
     },
@@ -365,6 +512,9 @@
       "show": {
         "operation": [
           "create_table"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -380,6 +530,9 @@
       "show": {
         "operation": [
           "create_table"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -395,6 +548,9 @@
       "show": {
         "operation": [
           "create_table"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -409,6 +565,9 @@
       "show": {
         "operation": [
           "create_table"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     },
@@ -433,6 +592,9 @@
       "show": {
         "operation": [
           "create_webhook"
+        ],
+        "resource": [
+          "webhook"
         ]
       }
     }
@@ -448,6 +610,9 @@
       "show": {
         "operation": [
           "create_webhook"
+        ],
+        "resource": [
+          "webhook"
         ]
       }
     }
@@ -462,6 +627,9 @@
       "show": {
         "operation": [
           "create_webhook"
+        ],
+        "resource": [
+          "webhook"
         ]
       }
     },
@@ -486,6 +654,9 @@
       "show": {
         "operation": [
           "get_project"
+        ],
+        "resource": [
+          "projects"
         ]
       }
     }
@@ -501,6 +672,9 @@
       "show": {
         "operation": [
           "get_project_api"
+        ],
+        "resource": [
+          "projects"
         ]
       }
     }
@@ -516,6 +690,9 @@
       "show": {
         "operation": [
           "get_schema"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -531,6 +708,9 @@
       "show": {
         "operation": [
           "get_usage"
+        ],
+        "resource": [
+          "projects"
         ]
       }
     }
@@ -546,6 +726,9 @@
       "show": {
         "operation": [
           "remove_team_member"
+        ],
+        "resource": [
+          "team"
         ]
       }
     }
@@ -561,6 +744,9 @@
       "show": {
         "operation": [
           "set_auth_enabled"
+        ],
+        "resource": [
+          "projects"
         ]
       }
     }
@@ -576,6 +762,9 @@
       "show": {
         "operation": [
           "set_auth_enabled"
+        ],
+        "resource": [
+          "projects"
         ]
       }
     }
@@ -591,6 +780,9 @@
       "show": {
         "operation": [
           "set_table_rls"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -606,6 +798,9 @@
       "show": {
         "operation": [
           "set_table_rls"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -635,6 +830,9 @@
       "show": {
         "operation": [
           "set_table_rls"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -664,6 +862,9 @@
       "show": {
         "operation": [
           "set_table_rls"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     }
@@ -678,6 +879,9 @@
       "show": {
         "operation": [
           "set_table_rls"
+        ],
+        "resource": [
+          "schema"
         ]
       }
     },
@@ -702,6 +906,9 @@
       "show": {
         "operation": [
           "update_team_member"
+        ],
+        "resource": [
+          "team"
         ]
       }
     }
@@ -727,6 +934,9 @@
       "show": {
         "operation": [
           "update_team_member"
+        ],
+        "resource": [
+          "team"
         ]
       }
     }
@@ -741,6 +951,9 @@
       "show": {
         "operation": [
           "update_team_member"
+        ],
+        "resource": [
+          "team"
         ]
       }
     },

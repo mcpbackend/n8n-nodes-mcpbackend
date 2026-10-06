@@ -3,8 +3,14 @@ import type {IHookFunctions,INodeType,INodeTypeDescription,IWebhookFunctions,IWe
 import {NodeConnectionTypes,NodeOperationError} from 'n8n-workflow';
 interface Hook {id:string;secret?:string;target?:string;url?:string;enabled?:boolean;status?:string}
 async function api(ctx:IHookFunctions,method:IHttpRequestMethods,path:string,body?:object):Promise<{alerts?:Hook[];webhooks?:Hook[];alert?:Hook;webhook?:Hook;signing_secret?:string}> {
- try {const response=await ctx.helpers.httpRequestWithAuthentication.call(ctx,'mcpbackendOAuth2Api',{method,url:'https://mcp.mcpbackend.com'+path,json:true,disableFollowRedirect:true,timeout:30000,...(body?{body}:{})});return response;}
+ try {const response=await ctx.helpers.httpRequestWithAuthentication.call(ctx,'mcpbackendOAuth2Api',{method,url:'https://mcpbackend.com'+path,json:true,disableFollowRedirect:true,timeout:30000,...(body?{body}:{})});return response;}
  catch {throw new NodeOperationError(ctx.getNode(),'Webhook registration failed. Check the connection, account permissions, plan, and selected resource.');}
+}
+function parseEvents(value:string,node:ReturnType<IHookFunctions['getNode']>):string[] {
+ let events:unknown;
+ try {events=JSON.parse(value);} catch {throw new NodeOperationError(node,'Events must be a valid JSON array, e.g. ["*.created", "*.updated"]');}
+ if(!Array.isArray(events)||events.length===0||events.length>100||events.some(event=>typeof event!=='string'||!event.trim()||event.length>160))throw new NodeOperationError(node,'Events must be a non-empty JSON array of event names');
+ return events;
 }
 export class MCPBackendTrigger implements INodeType {
  description:INodeTypeDescription={
@@ -21,7 +27,7 @@ export class MCPBackendTrigger implements INodeType {
   async create(this:IHookFunctions):Promise<boolean> {
    const url=this.getNodeWebhookUrl('default') as string;
    if(!url.startsWith('https://'))throw new NodeOperationError(this.getNode(),'Configure a public HTTPS webhook URL in n8n before activating this trigger.');
-   const result=await api(this,'POST',`/v1/projects/${encodeURIComponent(this.getNodeParameter('projectId') as string)}/webhooks`,{url,events:JSON.parse(this.getNodeParameter('events') as string)});
+   const result=await api(this,'POST',`/v1/projects/${encodeURIComponent(this.getNodeParameter('projectId') as string)}/webhooks`,{url,events:parseEvents(this.getNodeParameter('events') as string,this.getNode())});
    const hook=result.webhook;if(!hook?.id||!hook.secret)throw new NodeOperationError(this.getNode(),'The API did not return the subscription identifier and signing secret.');
    const state=this.getWorkflowStaticData('node');state.subscriptionId=hook.id;state.signingSecret=hook.secret;state.resourceId=this.getNodeParameter('projectId') as string;return true;
   },
