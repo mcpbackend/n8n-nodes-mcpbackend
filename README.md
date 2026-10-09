@@ -18,24 +18,24 @@ Choose a **Resource**, then an **Operation**. Only operations and input fields f
 
 ### Requests
 
-| Operation | HTTP request |
-| --- | --- |
-| add_column | `POST /v1/projects/:projectId/tables/:table/columns` |
-| add_team_member | `POST /v1/team` |
-| create_api_key | `POST /v1/projects/:projectId/keys` |
-| create_project | `POST /v1/projects` |
-| create_table | `POST /v1/projects/:projectId/tables` |
-| create_webhook | `POST /v1/projects/:projectId/webhooks` |
-| get_project | `GET /v1/projects/:projectId` |
-| get_project_api | `GET /v1/projects/:projectId/openapi.json` |
-| get_schema | `GET /v1/projects/:projectId/schema` |
-| get_usage | `GET /v1/projects/:projectId/usage` |
-| list_projects | `GET /v1/projects` |
-| list_team_members | `GET /v1/team` |
-| remove_team_member | `DELETE /v1/team/:memberId` |
-| set_auth_enabled | `PUT /v1/projects/:projectId/auth` |
-| set_table_rls | `PUT /v1/projects/:projectId/tables/:table/rls` |
-| update_team_member | `PATCH /v1/team/:memberId` |
+| Operation          | HTTP request                                         |
+| ------------------ | ---------------------------------------------------- |
+| add_column         | `POST /v1/projects/:projectId/tables/:table/columns` |
+| add_team_member    | `POST /v1/team`                                      |
+| create_api_key     | `POST /v1/projects/:projectId/keys`                  |
+| create_project     | `POST /v1/projects`                                  |
+| create_table       | `POST /v1/projects/:projectId/tables`                |
+| create_webhook     | `POST /v1/projects/:projectId/webhooks`              |
+| get_project        | `GET /v1/projects/:projectId`                        |
+| get_project_api    | `GET /v1/projects/:projectId/openapi.json`           |
+| get_schema         | `GET /v1/projects/:projectId/schema`                 |
+| get_usage          | `GET /v1/projects/:projectId/usage`                  |
+| list_projects      | `GET /v1/projects`                                   |
+| list_team_members  | `GET /v1/team`                                       |
+| remove_team_member | `DELETE /v1/team/:memberId`                          |
+| set_auth_enabled   | `PUT /v1/projects/:projectId/auth`                   |
+| set_table_rls      | `PUT /v1/projects/:projectId/tables/:table/rls`      |
+| update_team_member | `PATCH /v1/team/:memberId`                           |
 
 ## Signed webhook trigger
 
@@ -60,3 +60,9 @@ MIT license.
 ## REST API contract
 
 The request origin and OAuth resource are the product API shown above. GET reads a resource, POST creates or requests an explicitly confirmed action, PATCH updates, and DELETE removes the selected owned resource. The node does not forward requests to a protocol server. Authentication, permissions and ownership are enforced before the API executes an operation.
+
+## Release checks (3.1.0)
+
+Resource and Operation definitions are explicit in the TypeScript node source. This minor update preserves API endpoints, credential types and operation identifiers. Every publication must pass Prettier, the official n8n node CLI linter with zero warnings, the runtime tests, and the n8n community package scanner against both TypeScript source and compiled JavaScript. GitHub Actions runs these checks before publishing with npm provenance.
+
+Run `npm ci --ignore-scripts`, `npm test`, and `npm run review` before proposing a release.
