@@ -68,7 +68,7 @@ function parseEvents(value: string, node: ReturnType<IHookFunctions['getNode']>)
 		throw new NodeOperationError(node, 'Events must be a non-empty JSON array of event names');
 	return events;
 }
-export class MCPBackendTrigger implements INodeType {
+export class McpbackendTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'MCPBackend Trigger',
 		name: 'mcpbackendTrigger',
